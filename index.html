@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>គណនាតម្រាអត្ត:</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Battambang for Khmer text (for general text and now h1) -->
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- html2canvas for capturing div as image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Battambang', sans-serif; /* Apply Battambang font for general text */
+            background-color: #0a0a0a; /* Deep black for glossy look */
+        }
+
+        /* Reverted h1 to use body's font-family (Battambang) */
+        h1 {
+            font-family: 'Battambang', sans-serif; /* Explicitly set or remove this rule to inherit from body */
+        }
+
+        /* Custom styles for better appearance */
+        .container-box {
+            background-color: #ffffff;
+            padding: 2rem; /* 32px */
+            border-radius: 1rem; /* 16px */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+            width: 100%;
+            max-width: 28rem; /* max-w-md */
+            border: 1px solid #93c5fd; /* border-blue-300 */
+            transform: scale(1);
+            transition: all 0.3s ease-in-out;
+        }
+        .container-box:hover {
+            transform: scale(1.02); /* Slightly larger scale on hover */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* shadow-2xl */
+        }
+
+        /* Input label style */
+        .input-label {
+            display: block;
+            color: #4b5563; /* text-gray-700 */
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem; /* mb-2 */
+            text-align: center; /* Center the label text */
+        }
+        /* Input field style */
+        .input-field {
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 1.125rem; /* text-xl */
+            color: #1f2937; /* text-gray-800 */
+            transition: all 0.2s ease-in-out;
+            text-align: center; /* Center the input value */
+            display: block; /* Ensure it takes its own line for mx-auto to work */
+            margin-left: auto; /* Center horizontally */
+            margin-right: auto; /* Center horizontally */
+            width: 24; /* Fixed width as before */
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6; /* focus:border-blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:ring-blue-500 */
+        }
+
+        .button-style {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: 700; /* font-bold */
+            color: #ffffff; /* text-white */
+            transition: all 0.3s ease-in-out; /* Smooth transition for all properties */
+            transform: translateY(0); /* Initial state for transform */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* subtle shadow */
+            background-image: linear-gradient(to right, #2563eb, #1d4ed8); /* from-blue-600 to-blue-700 */
+        }
+        .button-style:hover {
+            transform: translateY(-0.25rem); /* Lift up more on hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Stronger shadow on hover */
+            background-image: linear-gradient(to right, #1d4ed8, #1e40af); /* Darker gradient on hover */
+        }
+        .button-style:active {
+            transform: translateY(0); /* Push down on click */
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06); /* Smaller shadow on click */
+        }
+        .button-style:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5); /* Blue ring on focus */
+        }
+        .button-style:disabled {
+            cursor: not-allowed;
+            background-image: linear-gradient(to right, #93c5fd, #60a5fa); /* bg-blue-300 to blue-400 */
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        .result-display {
+            margin-top: 1.5rem; /* mt-6 */
+            padding: 1.5rem; /* p-4 - Increased padding */
+            border-radius: 0.5rem; /* rounded-lg */
+            text-align: center;
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            background-color: #eff6ff; /* bg-blue-50 */
+            color: #1e40af; /* text-blue-800 */
+            border: 1px solid #bfdbfe; /* border-blue-200 */
+            overflow: visible; /* Ensure content is not clipped */
+            position: relative; /* Added for SVG positioning */
+        }
+        .error-message {
+            margin-top: 1rem; /* mt-4 */
+            padding: 0.75rem; /* p-3 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            background-color: #fee2e2; /* bg-red-100 */
+            color: #b91c1c; /* text-red-700 */
+            border: 1px solid #fca5a5; /* red-200 */
+        }
+        .hidden {
+            display: none;
+        }
+        /* Custom class for fixed-width number display */
+        .number-cell {
+            display: inline-flex; /* Changed to inline-flex to center SVG content */
+            align-items: center;
+            justify-content: center;
+            width: 2.8rem; /* Back to original size */
+            height: 2.8rem; /* Back to original size */
+            text-align: center;
+            color: #1e40af; /* Original blue color for all numbers */
+            transition: transform 0.2s ease-in-out, color 0.2s ease-in-out; /* Smooth transition for hover effects */
+            cursor: default; /* No longer clickable */
+            /* Explicit font size for text characters to match SVG sizing */
+            font-size: 1.3rem; /* Back to original size */
+        }
+        .number-cell:hover {
+            transform: scale(1); /* No scale on hover as lines are now automatic */
+            color: #1e40af; /* No color change on hover */
+        }
+        .number-cell svg {
+            width: 100%;
+            height: 100%;
+            display: block; /* Ensure SVG is block level inside flex container */
+            /* The fill for SVG paths will be set to 'currentColor' in JS,
+               so it inherits the text color of the parent .number-cell */
+        }
+        /* Specific style for download button to override general button-style for its background */
+        #downloadBtn {
+            background-image: linear-gradient(to right, #10b981, #059669); /* Green gradient */
+        }
+        #downloadBtn:hover {
+            background-image: linear-gradient(to right, #059669, #047857); /* Darker green gradient on hover */
+        }
+
+        /* Style for the new creation section */
+        .new-creation-section {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 28rem;
+            border: 1px solid #93c5fd;
+            text-align: center;
+        }
+
+        /* Styles for the new icon button (now with text) */
+        .icon-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem; /* Smaller padding than main buttons */
+            border-radius: 0.5rem; /* Rounded corners like other buttons */
+            font-size: 1rem; /* Smaller font size for text */
+            font-weight: 600; /* Slightly bold text */
+            color: #ffffff;
+            background-color: #6b7280; /* Gray background */
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+        .icon-button:hover {
+            background-color: #4b5563; /* Darker gray on hover */
+            transform: translateY(-0.125rem);
+            box-shadow: 0 8px 10px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .icon-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+        }
+        .icon-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(107, 114, 128, 0.5); /* Gray ring on focus */
+        }
+
+        /* Styles for the "Buy Coffee" button */
+        #buyCoffeeBtn {
+            background-image: linear-gradient(to right, #a0522d, #8b4513); /* Brown/saddlebrown gradient */
+        }
+        #buyCoffeeBtn:hover {
+            background-image: linear-gradient(to right, #8b4513, #69340f); /* Darker brown on hover */
+        }
+
+        /* New style for highlighted numbers (Red) */
+        .highlight-red {
+            color: #ef4444; /* Red color for highlighted text */
+            font-weight: bold;
+        }
+
+        /* New style for highlighted numbers (Yellow) */
+        .highlight-yellow {
+            color: #facc15; /* Tailwind yellow-400 */
+            font-weight: bold;
+        }
+
+        /* New style for highlighted numbers (Green - NO GLOW) */
+        .highlight-green {
+            color: #22c55e; /* Tailwind green-500 */
+            font-weight: bold;
+            /* Removed text-shadow for glow effect */
+        }
+        /* Style for the message box */
+        .message-box {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-700 */
+            border: 1px solid #a7f3d0; /* green-200 */
+            text-align: center;
+        }
+        .message-box.error {
+            background-color: #fee2e2; /* red-100 */
+            color: #b91c1c; /* red-700 */
+            border: 1px solid #fca5a5; /* red-200 */
+        }
+        /* Canvas specific styles */
+        #drawingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Disable pointer events for drawing on canvas directly */
+            z-index: 10; /* Ensure canvas is on top of numbers for drawing */
+            background: transparent; /* Make canvas background transparent */
+            display: none; /* Explicitly hide the canvas */
+        }
+        /* Style for the container of number cells, needed for proper positioning */
+        .number-row-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 0.5rem; /* Add some margin between rows for better line drawing */
+            height: 3rem; /* Fixed height for rows to make consistent spacing */
+            align-items: center; /* Center items vertically */
+        }
+        /* Adjust hr margin to compensate for new row container margin */
+        hr {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-900 p-4">
+    <div id="mainCalculator" class="container-box">
+        <h1 id="mainTitle" class="text-4xl font-extrabold text-center text-amber-500 mb-6 tracking-tight">
+            គណនាតម្រាអត្ត:
+        </h1>
+        <p id="mainDescription" class="text-gray-600 text-sm text-center mb-6">
+            សូមបញ្ចូលថ្ងៃ ខែ ឆ្នាំ កំណើតរបស់អ្នក តាមក្បួនអត្ត:
+        </p>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="space-y-6">
+            <div>
+                <label for="username" class="input-label">Username:</label>
+                <input
+                    type="text"
+                    id="username"
+                    class="input-field w-full"
+                    placeholder=""
+                    />
+            </div>
+            <div>
+                <label for="password" class="input-label">Password:</label>
+                <input
+                    type="text"
+                    id="password"
+                    class="input-field w-full"
+                    placeholder=""
+                    />
+            </div>
+            <button id="loginBtn" class="button-style mt-6">
+                ចូល
+            </button>
+            <div id="loginErrorMessage" class="error-message hidden"></div>
+        </div>
+
+        <!-- Calculator Content (initially hidden) -->
+        <div id="calculatorContent" class="hidden">
+            <div id="numberOptionControl" class="mb-4 max-w-xs mx-auto">
+                <label for="numberOption" class="block text-gray-700 text-base font-semibold mb-2 text-center">ផ្លាស់ប្តូរលេខ:</label>
+                <select
+                    id="numberOption"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out text-gray-800 text-base text-center"
+                >
+                    <option value="khmerAtta">លេខអត្ត:</option>
+                    <option value="khmerNumbers">លេខខ្មែរ</option> <!-- Moved to second position -->
+                    <option value="universalNumbers">លេខសកល</option> <!-- Moved to third position -->
+                </select>
+            </div>
+
+            <div id="inputControls"> <!-- New wrapper for input fields and calculate button -->
+                <div class="flex justify-center items-end gap-x-4">
+                    <div class="flex-1 min-w-0">
+                        <label for="dayOfWeek" class="input-label">ថ្ងៃ (1-7):</label>
+                        <input
+                            type="number"
+                            id="dayOfWeek"
+                            class="input-field w-full"
+                            min="1"
+                            max="7"
+                            />
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <label for="lunarMonth" class="input-label">ខែ (1-7):</label>
+                        <input
+                            type="number"
+                            id="lunarMonth"
+                            class="input-field w-full"
+                            min="1"
+                            max="7"
+                            />
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <label for="lunarAnimalYear" class="input-label">ឆ្នាំ (1-7):</label>
+                        <input
+                            type="number"
+                            id="lunarAnimalYear"
+                            class="input-field w-full"
+                            min="1"
+                            max="7"
+                            />
+                    </div>
+                </div>
+
+                <button id="calculateBtn" class="button-style mt-6">
+                    គណនារកឋានទី ១-៩
+                </button>
+            </div>
+
+            <div id="allKhongDekResults" class="result-display hidden">
+                <!-- Content will be injected here dynamically, including number-cell spans -->
+            </div>
+
+            <div id="errorMessage" class="error-message hidden">
+            </div>
+            
+            <div class="flex justify-center mt-4 space-x-4">
+                <button id="createNewBtn" class="icon-button">
+                    <i class="fas fa-calculator mr-2"></i> គណនាដួងកំណើតថ្មី
+                </button>
+            </div>
+        </div>
+
+        <div id="footerSocialsAndCopyright" class="mt-8 pt-4 border-t border-gray-300 text-center">
+            <div class="flex justify-center space-x-4">
+                <a href="https://www.facebook.com/beo3m4fkv0" target="_blank" class="text-blue-600 hover:text-blue-800 text-3xl">
+                    <i class="fab fa-facebook-square"></i>
+                </a>
+                <a href="https://t.me/MadamSoley" target="_blank" class="text-blue-400 hover:text-blue-600 text-3xl">
+                    <i class="fab fa-telegram"></i>
+                </a>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+                រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ: ក្រុមសិក្សាតម្រាលេខអត្ត:_ម៉ាដាម សូឡី
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+                បង្កើតឡើងដោយ: ជួន ជីម
+            </p>
+        </div>
+    </div>
+
+    <div id="newCreationSection" class="new-creation-section hidden">
+        <h2 class="text-3xl font-extrabold text-blue-800 mb-4">កន្លែងបង្កើតថ្មី</h2>
+        <p class="text-gray-700 text-lg mb-6">
+            នេះជាកន្លែងសម្រាប់បង្កើតមុខងារថ្មីៗ ឬកម្មវិធីផ្សេងទៀត។
+        </p>
+        <button id="goBackBtn" class="button-style bg-blue-500 hover:bg-blue-600">
+            ត្រឡប់ក្រោយ
+        </button>
+    </div>
+
+    <script>
+        // Helper function to normalize a value to the 1-7 range based on the rule
+        const normalizeToSeven = (value) => {
+            let result = (value - 1) % 7 + 1;
+            return result;
+        };
+
+        // Function to generate Khong Dek sequence and return as an array
+        const generateKhongDekSequence = (startValue) => {
+            const sequence = [];
+            for (let i = 0; i < 7; i++) {
+                const num = (startValue + i - 1) % 7 + 1;
+                sequence.push(num);
+            }
+            return sequence;
+        };
+
+        // Mapping for Atta numerals (លេខអត្ត:) based on user's images and clarifications
+        // For numbers 0, 1, 3, 4, 5, 6, 7, 8, the symbols are directly represented by Arabic digits or a common slash.
+        // For 9, using the provided SVG.
+        const khmerAttaNumeralsMap = {
+            0: '0',
+            1: 'Λ',
+            2: '<strong>|</strong>',
+            3: 'M',
+            4: 'V',
+            5: '૪',
+            6: '\\',
+            7: 'N',
+            8: '/',
+            9: `<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                width="100%" height="100%" viewBox="0 0 58.000000 76.000000"
+                preserveAspectRatio="xMidYMid meet">
+                <g transform="translate(0.000000,76.000000) scale(0.100000,-0.100000)"
+                fill="currentColor" stroke="none">
+                <path d="M203 459 c-104 -104 -120 -124 -114 -143 8 -19 17 -21 122 -26 63 -3
+                122 -9 132 -14 20 -10 24 -65 5 -84 -7 -7 -32 -12 -56 -12 -43 0 -43 0 -40
+                -32 3 -33 3 -33 53 -29 92 6 125 36 125 115 0 36 -6 52 -29 78 -29 32 -31 33
+                -123 35 -51 1 -97 2 -103 3 -5 0 -1 7 10 16 45 34 185 167 185 176 0 12 -26
+                38 -37 38 -4 0 -63 -55 -130 -121z"/>
+                </g>
+                </svg>`,
+        };
+
+
+        // Function to convert Arabic numerals to Khmer numerals
+        const convertToKhmerNumerals = (number) => {
+            const khmerDigits = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+            return String(number).split('').map(digit => khmerDigits[parseInt(digit)]).join('');
+        };
+
+        // Modified function to format sequence for display, now returns actual DOM elements
+        // This is crucial for getting their positions for drawing lines and attaching event listeners.
+        // Also added data-value attribute to store the actual numeric value.
+        const formatSequenceForDisplay = (sequence, highlightRules = [], numberingType = 'khmerAtta') => {
+            const rowElements = [];
+            sequence.forEach((num, index) => {
+                const span = document.createElement('span');
+                span.classList.add('number-cell');
+                span.dataset.value = num; // Store the actual numeric value
+
+                let classToApply = '';
+                for (const rule of highlightRules) {
+                    if (rule.indices.includes(index)) {
+                        if (rule.values === null || rule.values.length === 0 || rule.values.includes(num)) {
+                            classToApply = rule.colorClass;
+                            break;
+                        }
+                    }
+                }
+                if (classToApply) {
+                    span.classList.add(classToApply);
+                }
+
+                let displayContent;
+                if (numberingType === 'khmerNumbers') {
+                    displayContent = convertToKhmerNumerals(num);
+                } else if (numberingType === 'khmerAtta') {
+                    if (num > 9) {
+                        displayContent = String(num).split('').map(digit => khmerAttaNumeralsMap[parseInt(digit)] || digit).join('');
+                    } else {
+                        displayContent = khmerAttaNumeralsMap[num] || String(num); // Ensure it's a string
+                    }
+                } else {
+                    displayContent = String(num); // Ensure it's a string
+                }
+                span.innerHTML = displayContent; // Use innerHTML to allow for bold tag or SVG
+
+                rowElements.push(span);
+            });
+            return rowElements;
+        };
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const lunarMonthInput = document.getElementById('lunarMonth');
+            const lunarAnimalYearInput = document.getElementById('lunarAnimalYear');
+            const dayOfWeekInput = document.getElementById('dayOfWeek');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const allKhongDekResults = document.getElementById('allKhongDekResults');
+            const errorMessage = document.getElementById('errorMessage');
+            const inputControls = document.getElementById('inputControls');
+            const footerSocialsAndCopyright = document.getElementById('footerSocialsAndCopyright');
+            const mainTitle = document.getElementById('mainTitle');
+            const mainDescription = document.getElementById('mainDescription');
+            const numberOptionControl = document.getElementById('numberOptionControl');
+            const numberOptionSelect = document.getElementById('numberOption');
+
+            const createNewBtn = document.getElementById('createNewBtn');
+            const mainCalculator = document.getElementById('mainCalculator');
+            const newCreationSection = document.getElementById('newCreationSection');
+            const goBackBtn = document.getElementById('goBackBtn');
+
+            // Login specific elements - moved inside DOMContentLoaded
+            const loginForm = document.getElementById('loginForm');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginErrorMessage = document.getElementById('loginErrorMessage');
+            const calculatorContent = document.getElementById('calculatorContent');
+
+            // Define the predefined sequences for Khong Dek 8 based on the normalized first value of Khong Banchhor
+            const khongDekEightMappings = {
+                1: [1, 6, 4, 2, 7, 5, 3],
+                2: [2, 7, 5, 3, 1, 6, 4],
+                3: [3, 1, 6, 4, 2, 7, 5],
+                4: [4, 2, 7, 5, 3, 1, 6],
+                5: [5, 3, 1, 6, 4, 2, 7],
+                6: [6, 4, 2, 7, 5, 3, 1],
+                7: [7, 5, 3, 1, 6, 4, 2]
+            };
+
+            // Define the predefined sequences for the NEW row (based on initial sum of day, month, year)
+            const khongDekNineMappings = {
+                1: [1, 6, 4, 2, 7, 5, 3],
+                2: [2, 7, 5, 3, 1, 6, 4],
+                3: [3, 1, 6, 4, 2, 7, 5],
+                4: [4, 2, 7, 5, 3, 1, 6],
+                5: [5, 3, 1, 6, 4, 2, 7],
+                6: [6, 4, 2, 7, 5, 3, 1],
+                7: [7, 5, 3, 1, 6, 4, 2]
+            };
+
+            // Define the predefined sequences for the FINAL answer row based on user's request
+            const finalAnswerMappings = {
+                1: [3, 5, 7, 2, 4, 6, 1],
+                2: [4, 6, 1, 3, 5, 7, 2],
+                3: [5, 7, 2, 4, 6, 1, 3],
+                4: [6, 1, 3, 5, 7, 2, 4],
+                5: [7, 2, 4, 6, 1, 3, 5],
+                6: [1, 3, 5, 7, 2, 4, 6],
+                7: [2, 4, 6, 1, 3, 5, 7]
+            };
+
+            // Set default option to "លេខអត្ត:"
+            numberOptionSelect.value = "khmerAtta";
+
+            // Function to hide messages
+            const hideMessages = () => {
+                allKhongDekResults.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                loginErrorMessage.classList.add('hidden'); // Also hide login error message
+            };
+
+            // Function to display error message
+            const showErrorMessage = (message, targetElement) => {
+                hideMessages();
+                targetElement.textContent = message;
+                targetElement.classList.remove('hidden');
+            };
+
+            // Login functionality
+            loginBtn.addEventListener('click', () => {
+                const username = usernameInput.value;
+                const password = passwordInput.value;
+
+                if (username === 'admin' && password === 'atak') {
+                    loginForm.classList.add('hidden');
+                    calculatorContent.classList.remove('hidden');
+                    mainTitle.classList.remove('hidden'); // Show main title after login
+                    mainDescription.classList.remove('hidden'); // Show main description after login
+                    numberOptionControl.classList.remove('hidden'); // Show number option after login
+                    footerSocialsAndCopyright.classList.remove('hidden'); // Show footer after login
+                } else {
+                    showErrorMessage('ឈ្មោះអ្នកប្រើប្រាស់ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។', loginErrorMessage);
+                }
+            });
+
+            // Make enter key work for login
+            if (usernameInput) {
+                usernameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        passwordInput.focus();
+                    }
+                });
+            } else {
+                console.error("Username input element not found.");
+            }
+
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        loginBtn.click();
+                    }
+                });
+            } else {
+                console.error("Password input element not found.");
+            }
+
+            calculateBtn.addEventListener('click', () => {
+                hideMessages(); // Clear previous messages
+
+                let dayOfWeekValue = parseInt(dayOfWeekInput.value);
+                let lunarMonthValue = parseInt(lunarMonthInput.value);
+                let lunarAnimalYearValue = parseInt(lunarAnimalYearInput.value);
+
+                // Input validation for day of week (1-7)
+                if (isNaN(dayOfWeekValue) || dayOfWeekInput.value.trim() === '' ||
+                    dayOfWeekValue < 1 || dayOfWeekValue > 7) {
+                    showErrorMessage('សូមបញ្ចូលថ្ងៃក្នុងសប្តាហ៍ជាលេខពី 1 ដល់ 7។', errorMessage);
+                    return;
+                }
+                // Input validation for month (1-7)
+                if (isNaN(lunarMonthValue) || lunarMonthInput.value.trim() === '' ||
+                    lunarMonthValue < 1 || lunarMonthValue > 7) {
+                    showErrorMessage('សូមបញ្ចូលខែជាលេខពី 1 ដល់ 7។', errorMessage);
+                    return;
+                }
+                // Input validation for animal year (1-7)
+                if (isNaN(lunarAnimalYearValue) || lunarAnimalYearInput.value.trim() === '' ||
+                    lunarAnimalYearValue < 1 || lunarAnimalYearValue > 7) {
+                    showErrorMessage('សូមបញ្ចូលឆ្នាំសត្វជាលេខពី 1 ដល់ 7។', errorMessage);
+                    return;
+                }
+
+                // Get the selected numbering option
+                const selectedNumberOption = numberOptionSelect.value;
+
+                // Apply the normalization rule to each input value (always normalize to 1-7 for inputs, as per Atta rules)
+                dayOfWeekValue = normalizeToSeven(dayOfWeekValue);
+                lunarMonthValue = normalizeToSeven(lunarMonthValue);
+                lunarAnimalYearValue = normalizeToSeven(lunarAnimalYearValue);
+
+                // Generate Khong Dek sequences as arrays (for internal calculation based on 1-7)
+                const khongDekDaySequenceNums = generateKhongDekSequence(dayOfWeekValue);
+                const khongDekMonthSequenceNums = generateKhongDekSequence(lunarMonthValue);
+                const khongDekAnimalYearSequenceNums = generateKhongDekSequence(lunarAnimalYearValue);
+
+                // Calculate Khong Banchhor (Vertical Digits) - raw sum
+                const khongBanchhorSequence = [];
+                for (let i = 0; i < 7; i++) {
+                    const sum = khongDekDaySequenceNums[i] + khongDekMonthSequenceNums[i] + khongDekAnimalYearSequenceNums[i];
+                    khongBanchhorSequence.push(sum);
+                }
+
+                // Logic for Khong Dek 8 (ជួរទី 8) - Normalized sum of Khong Banchhor values
+                const khongDekEightSequence = [];
+                for (let i = 0; i < 7; i++) {
+                    const normalizedSum = normalizeToSeven(khongBanchhorSequence[i]);
+                    khongDekEightSequence.push(normalizedSum);
+                }
+
+                // Calculate Khong Dek 6 (Based on Khong Dek 8 * 2, then normalize to 1-7)
+                const khongDekSixSequence = [];
+                for (let i = 0; i < 7; i++) {
+                    let multipliedValue = khongDekEightSequence[i] * 2;
+                    khongDekSixSequence.push(normalizeToSeven(multipliedValue));
+                }
+
+                // Calculate Khong Dek 7 (New row based on Khong Dek 6 * 2, then normalize to 1-7)
+                const khongDekSevenSequence = [];
+                for (let i = 0; i < 7; i++) {
+                    let multipliedValue = khongDekSixSequence[i] * 2;
+                    khongDekSevenSequence.push(normalizeToSeven(multipliedValue));
+                }
+
+                // Calculation for Khong Dek Nine (previously "ជួរចុងក្រោយ")
+                const initialSumForNine = dayOfWeekValue + lunarMonthValue + lunarAnimalYearValue;
+                const normalizedInitialSumForNine = normalizeToSeven(initialSumForNine);
+                const khongDekNineSequence = khongDekNineMappings[normalizedInitialSumForNine];
+
+                // NEW CALCULATION FOR THE FINAL ANSWER ROW (ជួរចម្លើយចុងក្រោយ)
+                // 1. Get the 28th digit (which is the last digit of Khong Banchhor Sequence, index 6)
+                const digit28 = khongBanchhorSequence[6];
+
+                // 2. Get the 56th digit (which is the last digit of Khong Dek Nine Sequence, index 6)
+                const digit56 = khongDekNineSequence[6];
+
+                // 3. Sum these two digits
+                const sumOfDigits = digit28 + digit56;
+
+                // 4. Normalize the sum to get the key for the final answer sequence
+                const finalAnswerDigitKey = normalizeToSeven(sumOfDigits);
+
+                // 5. Get the final answer sequence from the predefined mappings
+                const khongDekLastSequence = finalAnswerMappings[finalAnswerDigitKey];
+
+
+                // Define highlight rules for each sequence based on the provided image
+                const khongDekDayHighlightRules = [{ indices: [1], values: null, colorClass: 'highlight-red' }];
+
+                const khongDekMonthHighlightRules = [
+                    // Rule: 13th digit overall (index 5 of month sequence) should always be red
+                    { indices: [5], values: null, colorClass: 'highlight-red' }
+                ];
+                
+                // khongDekAnimalYearHighlightRules array: Re-adding highlight for index 0 (15th digit overall) AND index 4 (19th digit overall)
+                const khongDekAnimalYearHighlightRules = [{ indices: [0, 4], values: null, colorClass: 'highlight-red' }];
+
+                const khongBanchhorHighlightRules = [
+                    // Green highlight rule for specific values (no glow)
+                    {
+                        indices: [0, 1, 2, 3, 4, 5, 6], // Corresponds to global positions 22-28
+                        values: [9, 11, 16, 19],
+                        colorClass: 'highlight-green'
+                    },
+                    // Red highlight rule for specific values
+                    {
+                        indices: [0, 1, 2, 3, 4, 5, 6], // Corresponds to global positions 22-28
+                        values: [12, 3, 8, 7, 10, 20],
+                        colorClass: 'highlight-red'
+                    },
+                    // Yellow highlight rule for specific values (updated to include 4, 6, 18, 14)
+                    {
+                        indices: [0, 1, 2, 3, 4, 5, 6], // Corresponds to global positions 22-28
+                        values: [5, 13, 15, 17, 21, 4, 6, 18, 14], // Added 14 here
+                        colorClass: 'highlight-yellow'
+                    }
+                ];
+
+                const khongDekEightHighlightRules = [{ indices: [1], values: null, colorClass: 'highlight-red' }];
+                const khongDekSixHighlightRules = [{ indices: [5], values: null, colorClass: 'highlight-red' }];
+                const khongDekSevenHighlightRules = [{ indices: [0, 4], values: null, colorClass: 'highlight-red' }];
+                
+                // Add highlight for index 4 (54th digit overall) and index 5 (55th digit overall) in khongDekNineHighlightRules
+                const khongDekNineHighlightRules = [{ indices: [4, 5], values: null, colorClass: 'highlight-red' }]; 
+                const khongDekLastHighlightRules = []; // No highlights for this row
+
+
+                // Format all sequences for display, getting back actual DOM elements for positioning
+                const khongDekDayElements = formatSequenceForDisplay(khongDekDaySequenceNums, khongDekDayHighlightRules, selectedNumberOption);
+                const khongDekMonthElements = formatSequenceForDisplay(khongDekMonthSequenceNums, khongDekMonthHighlightRules, selectedNumberOption);
+                const khongDekAnimalYearElements = formatSequenceForDisplay(khongDekAnimalYearSequenceNums, khongDekAnimalYearHighlightRules, selectedNumberOption);
+                const khongBanchhorElements = formatSequenceForDisplay(khongBanchhorSequence, khongBanchhorHighlightRules, selectedNumberOption);
+                const khongDekEightElements = formatSequenceForDisplay(khongDekEightSequence, khongDekEightHighlightRules, selectedNumberOption);
+                const khongDekSixElements = formatSequenceForDisplay(khongDekSixSequence, khongDekSixHighlightRules, selectedNumberOption);
+                const khongDekSevenElements = formatSequenceForDisplay(khongDekSevenSequence, khongDekSevenHighlightRules, selectedNumberOption);
+                const khongDekNineElements = formatSequenceForDisplay(khongDekNineSequence, khongDekNineHighlightRules, selectedNumberOption);
+                const khongDekLastElements = formatSequenceForDisplay(khongDekLastSequence, khongDekLastHighlightRules, selectedNumberOption);
+
+
+                // Clear previous HTML content and append new elements
+                allKhongDekResults.innerHTML = ''; // Clear previous content
+                allKhongDekResults.classList.remove('hidden');
+
+                const appendRow = (elements) => {
+                    const div = document.createElement('div');
+                    div.classList.add('number-row-container'); // Use flex to space elements
+                    elements.forEach(el => div.appendChild(el));
+                    allKhongDekResults.appendChild(div);
+                };
+
+                appendRow(khongDekDayElements);
+                appendRow(khongDekMonthElements);
+                appendRow(khongDekAnimalYearElements);
+                allKhongDekResults.innerHTML += '<hr class="my-4 border-t-2 border-black mx-auto w-full">';
+                appendRow(khongBanchhorElements);
+                appendRow(khongDekEightElements);
+                appendRow(khongDekSixElements);
+                appendRow(khongDekSevenElements);
+                allKhongDekResults.innerHTML += '<hr class="my-4 border-t-2 border-black mx-auto w-full">';
+                appendRow(khongDekNineElements);
+                appendRow(khongDekLastElements);
+
+                inputControls.classList.add('hidden'); // Hide input fields and calculate button
+                footerSocialsAndCopyright.classList.add('hidden'); // Hide the footer section
+                mainTitle.classList.add('hidden'); // Hide the main title
+                mainDescription.classList.add('hidden'); // Hide the main description
+                numberOptionControl.classList.add('hidden'); // Hide the new number option control
+            });
+
+            // Event listener for the "Create New" button (now functions as a reset for the calculator)
+            createNewBtn.addEventListener('click', () => {
+                allKhongDekResults.classList.add('hidden'); // Hide results
+                inputControls.classList.remove('hidden'); // Show input fields and calculate button
+                dayOfWeekInput.value = ''; // Clear input fields
+                lunarMonthInput.value = '';
+                lunarAnimalYearInput.value = '';
+                errorMessage.classList.add('hidden'); // Hide any error messages
+                footerSocialsAndCopyright.classList.remove('hidden'); // Show the footer section again
+                mainTitle.classList.remove('hidden'); // Show the main title
+                mainDescription.classList.remove('hidden'); // Show the main description
+                numberOptionControl.classList.remove('hidden'); // Show the new number option control
+            });
+
+            // Event listener for the "Go Back" button (from new creation section)
+            goBackBtn.addEventListener('click', () => {
+                newCreationSection.classList.add('hidden'); // Hide the new creation section
+                mainCalculator.classList.remove('hidden'); // Show the main calculator
+                hideMessages(); // Clear any messages/results from the calculator
+                inputControls.classList.remove('hidden'); // Ensure input controls are visible when returning
+                footerSocialsAndCopyright.classList.remove('hidden'); // Show the footer section again
+                mainTitle.classList.remove('hidden'); // Show the main title
+                mainDescription.classList.remove('hidden'); // Show the main description
+                numberOptionControl.classList.remove('hidden'); // Show the new number option control
+            });
+
+            // Local visitor counter logic
+            let visitorCount = localStorage.getItem('khmerLunarCalculatorVisits');
+            if (visitorCount) {
+                visitorCount = parseInt(visitorCount) + 1;
+            } else {
+                visitorCount = 1;
+            }
+            localStorage.setItem('khmerLunarCalculatorVisits', visitorCount);
+            
+            // Optional: Clear messages when any input changes
+            dayOfWeekInput.addEventListener('input', hideMessages);
+            lunarMonthInput.addEventListener('input', hideMessages);
+            lunarAnimalYearInput.addEventListener('input', hideMessages);
+
+            // Initially hide calculator content and show login form
+            calculatorContent.classList.add('hidden');
+            mainTitle.classList.add('hidden');
+            mainDescription.classList.add('hidden');
+            numberOptionControl.classList.add('hidden');
+            footerSocialsAndCopyright.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
